@@ -1,6 +1,21 @@
-function djikstra(node1, node2){
+function dijkstra(startNode, endNode){
   // Fill in this function
-  return []; //'shortest distance list of nodes from node1 to node2';
+  var path = [];
+  path.push(startNode);
+  var current = startNode;
+  while( ~path.indexOf(endNode) ){
+    path = path.reduce(function(newPath, node){
+      newPath.push(node)
+      node.neighbors.forEach(function(neighbor){
+        if(!~newPath.indexOf(neighbor)){
+          newPath.push(neighbor);
+        }
+      })
+    },[]);
+  }
+  path.push(endNode);
+  console.log(path);
+  return path; //'shortest distance list of nodes from startNode to endNode';
 };
 
 function heuristic(idk){
@@ -8,14 +23,14 @@ function heuristic(idk){
   return '?';
 };
 
-function astar(node1, node2){
+function astar(startNode, endNode){
   // Fill in this function
-  return []; //'shortest distance list of nodes from node1 to node2';
+  return []; //'shortest distance list of nodes from startNode to endNode';
 };
 
 // Graph
-function Node(cost){
-  this.cost = cost;
+function Node(name){
+  this.name = name;
   this.visited = false;
   this.neighbors = [];
 };
