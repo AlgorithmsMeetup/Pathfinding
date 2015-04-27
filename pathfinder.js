@@ -1,20 +1,22 @@
 function dijkstra(startNode, endNode){
   // Fill in this function
   var path = [];
-  path.push(startNode);
   var current = startNode;
-  while( ~path.indexOf(endNode) ){
-    path = path.reduce(function(newPath, node){
-      newPath.push(node)
-      node.neighbors.forEach(function(neighbor){
-        if(!~newPath.indexOf(neighbor)){
-          newPath.push(neighbor);
-        }
-      })
-    },[]);
+  current.visit();
+  path.push(current);
+  while( !~path.indexOf(endNode) ){
+    var nextNode;
+    if( ~current.neighbors.indexOf(endNode) ){
+      nextNode = endNode;
+    } else {
+      nextNode = current.neighbors.reduce(function(lowestCostNode, neighbor){
+        return neighbor.cost < lowestCostNode.cost ? neighbor : lowestCostNode;
+      }, {cost: Infinity});
+    }
+    current = nextNode;
+    current.visit();
+    path.push(current);
   }
-  path.push(endNode);
-  console.log(path);
   return path; //'shortest distance list of nodes from startNode to endNode';
 };
 
@@ -29,8 +31,9 @@ function astar(startNode, endNode){
 };
 
 // Graph
-function Node(name){
+function Node(name, cost){
   this.name = name;
+  this.cost = cost;
   this.visited = false;
   this.neighbors = [];
 };
