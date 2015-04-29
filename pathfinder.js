@@ -4,7 +4,9 @@ function dijkstra(startNode, endNode){
   var current = startNode;
   current.visit();
   path.push(current);
-  while( !~path.indexOf(endNode) ){
+  var safetyValue = 0;
+  while( !~path.indexOf(endNode) && safetyValue < 1000 ){
+    safetyValue++;
     var nextNode;
     if( ~current.neighbors.indexOf(endNode) ){
       nextNode = endNode;
