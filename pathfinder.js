@@ -1,25 +1,40 @@
 function dijkstra(startNode, endNode){
-  // Fill in this function
-  var path = [];
-  var current = startNode;
-  current.visit();
-  path.push(current);
-  var safetyValue = 0;
-  while( !~path.indexOf(endNode) && safetyValue < 1000 ){
-    safetyValue++;
-    var nextNode;
-    if( ~current.neighbors.indexOf(endNode) ){
-      nextNode = endNode;
-    } else {
-      nextNode = current.neighbors.reduce(function(lowestCostNode, neighbor){
-        return neighbor.cost < lowestCostNode.cost ? neighbor : lowestCostNode;
-      }, {cost: Infinity});
-    }
-    current = nextNode;
-    current.visit();
-    path.push(current);
+  var visitedNodes = [];
+  var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTentativeCost and splice
+  startNode.setTentativeCost(startNode.cost);
+  // assign tentative costs until end is visited
+  while(currentNode !== endNode){
+    // set current node to unvisited node w least tentative cost
+    var currentNode = getNodeWithLeastTentativeCost(unvisitedNodes);
+    // consider unvisited neighbors
+    var unvisitedNeighbors = currentNode.neighbors.filter(function(node){ return !~visitedNodes.indexOf(node); });;
+    // add unvisited neighbors to unvisited minHeap
+    unvisitedNodes = unvisitedNodes.concat(unvisitedNeighbors);
+    // for each unvisited neighbor: calculate, compare, and if less, set tentative cost
+    unvisitedNeighbors.forEach(function(neighbor){
+      var tentativeCost = currentNode.tentativeCost + neighbor.cost;
+      if (tentativeCost < neighbor.tentativeCost){
+        neighbor.setTentativeCost(tentativeCost);
+      }
+    });
+    // mark current node as visited
+    visitedNodes.push(unvisitedNodes.splice(unvisitedNodes.indexOf(currentNode), 1)[0]);
   }
-  return path; //'shortest distance list of nodes from startNode to endNode';
+
+  // find shortest path
+  var shortestPath = [endNode];
+  while(currentNode !== startNode){ // currentNode === endNode
+    currentNode = getNodeWithLeastTentativeCost(currentNode.neighbors);
+    shortestPath.push(currentNode);
+  }
+  shortestPath = shortestPath.reverse();
+  return shortestPath; // shortest distance list of nodes from startNode to endNode
+};
+
+function getNodeWithLeastTentativeCost(nodes){
+  return nodes.reduce(function getLeastTentativeCost(leastNode, nextNode){
+    return leastNode.tentativeCost < nextNode.tentativeCost ? leastNode : nextNode ;
+  }, nodes[0]);
 };
 
 function heuristic(idk){
@@ -29,19 +44,19 @@ function heuristic(idk){
 
 function astar(startNode, endNode){
   // Fill in this function
-  return []; //'shortest distance list of nodes from startNode to endNode';
+  return []; // shortest distance list of nodes from startNode to endNode
 };
 
 // Graph
 function Node(name, cost){
   this.name = name;
   this.cost = cost;
-  this.visited = false;
+  this.tentativeCost = Infinity;
   this.neighbors = [];
 };
 
-Node.prototype.visit = function(value) {
-  this.visited = value || true;
+Node.prototype.setTentativeCost = function(value) {
+  this.tentativeCost = value;
 };
 
 Node.prototype.connectTo = function(node){
@@ -49,9 +64,4 @@ Node.prototype.connectTo = function(node){
     this.neighbors.push(node);
     node.connectTo(this);
   }
-};
-
-// test methods; don't use these!
-Node.prototype.unvisit = function() {
-  this.visited = false;
 };
