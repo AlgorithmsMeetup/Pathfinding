@@ -1,3 +1,19 @@
+function getNodeWithLeastTentativeCost(nodes){
+  return nodes.reduce(function getLeastTentativeCost(leastNode, nextNode){
+    return leastNode.tentativeCost < nextNode.tentativeCost ? leastNode : nextNode ;
+  }, nodes[0]);
+};
+
+function findShortestPath(currentNode, endNode){ // where nodes between start and end have tentative costs.
+  var shortestPath = [currentNode];
+  while(currentNode !== endNode){
+    currentNode = getNodeWithLeastTentativeCost(currentNode.neighbors);
+    shortestPath.push(currentNode);
+  }
+  shortestPath = shortestPath.reverse();
+  return shortestPath;
+};
+
 function dijkstra(startNode, endNode){
   var visitedNodes = [];
   var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTentativeCost and splice
@@ -22,19 +38,7 @@ function dijkstra(startNode, endNode){
   }
 
   // find shortest path
-  var shortestPath = [endNode];
-  while(currentNode !== startNode){ // currentNode === endNode
-    currentNode = getNodeWithLeastTentativeCost(currentNode.neighbors);
-    shortestPath.push(currentNode);
-  }
-  shortestPath = shortestPath.reverse();
-  return shortestPath; // shortest distance list of nodes from startNode to endNode
-};
-
-function getNodeWithLeastTentativeCost(nodes){
-  return nodes.reduce(function getLeastTentativeCost(leastNode, nextNode){
-    return leastNode.tentativeCost < nextNode.tentativeCost ? leastNode : nextNode ;
-  }, nodes[0]);
+  return findShortestPath(currentNode, startNode) // currentNode === endNode
 };
 
 function heuristic(idk){
