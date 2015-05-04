@@ -41,22 +41,13 @@ function dijkstra(startNode, endNode){
   return findShortestPath(currentNode, startNode) // currentNode === endNode
 };
 
-function heuristic(idk){
-  // Fill in this function
-  return '?';
-};
-
-function astar(startNode, endNode){
-  // Fill in this function
-  return []; // shortest distance list of nodes from startNode to endNode
-};
-
 // Graph
-function Node(name, cost){
+function Node(name, cost, coords){
   this.name = name;
   this.cost = cost;
   this.tentativeCost = Infinity;
   this.neighbors = [];
+  this.coords = coords; // don't worry about coords until A*
 };
 
 Node.prototype.setTentativeCost = function(value) {
@@ -68,4 +59,40 @@ Node.prototype.connectTo = function(node){
     this.neighbors.push(node);
     node.connectTo(this);
   }
+};
+
+function createDistanceHeuristic(goalCoords){
+  return function distanceHeuristic(currentCoords){ // closure/function generator is useful to avoid repeating goalCoords
+    var deltaX = currentCoords.x - goalCoords.x;
+    var deltaY = currentCoords.y - goalCoords.y;
+    return math.sqrt(deltaX*deltaX + deltaY*deltaY);
+  };
+};
+
+function astar(startNode, endNode){
+  var visitedNodes = [];
+  var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTentativeCost and splice
+  var distanceHeuristic = createDistanceHeuristic(endNode.coords); // initialize heuristic
+  startNode.setTentativeCost(startNode.cost - distanceHeuristic(startNode.coords)); // use heuristic
+  // assign tentative costs until end is visited
+  while(currentNode !== endNode){
+    // set current node to unvisited node w least tentative cost
+    var currentNode = getNodeWithLeastTentativeCost(unvisitedNodes);
+    // consider unvisited neighbors
+    var unvisitedNeighbors = currentNode.neighbors.filter(function(node){ return !~visitedNodes.indexOf(node); });;
+    // add unvisited neighbors to unvisited minHeap
+    unvisitedNodes = unvisitedNodes.concat(unvisitedNeighbors);
+    // for each unvisited neighbor: calculate, compare, and if less, set tentative cost
+    unvisitedNeighbors.forEach(function(neighbor){
+      var tentativeCost = currentNode.tentativeCost + neighbor.cost - distanceHeuristic(neighbor.coords); // use heuristic
+      if (tentativeCost < neighbor.tentativeCost){
+        neighbor.setTentativeCost(tentativeCost);
+      }
+    });
+    // mark current node as visited
+    visitedNodes.push(unvisitedNodes.splice(unvisitedNodes.indexOf(currentNode), 1)[0]);
+  }
+
+  // find shortest path
+  return findShortestPath(currentNode, startNode) // currentNode === endNode
 };
