@@ -1,3 +1,5 @@
+// Dijkstra's Algorithm
+
 function getNodeWithLeastTentativeCost(nodes){
   return nodes.reduce(function getLeastTentativeCost(leastNode, nextNode){
     return leastNode.tentativeCost < nextNode.tentativeCost ? leastNode : nextNode ;
@@ -17,6 +19,7 @@ function findShortestPath(currentNode, endNode){ // where nodes between start an
 };
 
 function dijkstra(startNode, endNode){
+  console.log({getAllNodes:getAllNodes(startNode)});
   var visitedNodes = [];
   var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTentativeCost and splice
   startNode.setTentativeCost(startNode.cost);
@@ -43,7 +46,7 @@ function dijkstra(startNode, endNode){
   return findShortestPath(currentNode, startNode) // currentNode === endNode
 };
 
-// Graph
+// Nodes for Graphs/Maps
 function Node(name, cost){
   this.name = name;
   this.cost = cost;
@@ -62,9 +65,7 @@ Node.prototype.connectTo = function(node){
   }
 };
 
-Node.prototype.setCoords = function(x, y){ // don't worry about coords till A*
-  this.coords = {x: x, y: y};
-};
+// A*
 
 function createDistanceHeuristic(goalCoords){
   return function distanceHeuristic(currentCoords){ // closure/function generator is useful to avoid repeating goalCoords
@@ -78,20 +79,22 @@ function astar(startNode, endNode){
   var visitedNodes = [];
   var unvisitedNodes = [startNode];
   var distanceHeuristic = createDistanceHeuristic(endNode.coords); // initialize heuristic
-  startNode.setTentativeCost(startNode.cost - distanceHeuristic(startNode.coords)); // use heuristic
+  startNode.setTentativeCost(startNode.cost + distanceHeuristic(startNode.coords)); // use heuristic
   while(currentNode !== endNode){
-    console.log('currentNode',currentNode);
     var currentNode = getNodeWithLeastTentativeCost(unvisitedNodes);
     var unvisitedNeighbors = currentNode.neighbors.filter(function(node){ return !~visitedNodes.indexOf(node); });;
     unvisitedNodes = unvisitedNodes.concat(unvisitedNeighbors);
     unvisitedNeighbors.forEach(function(neighbor){
-      var tentativeCost = currentNode.tentativeCost + neighbor.cost - distanceHeuristic(neighbor.coords); // use heuristic
+      var tentativeCost = currentNode.tentativeCost + neighbor.cost + distanceHeuristic(neighbor.coords); // use heuristic
       if (tentativeCost < neighbor.tentativeCost){
         neighbor.setTentativeCost(tentativeCost);
       }
     });
     visitedNodes.push(unvisitedNodes.splice(unvisitedNodes.indexOf(currentNode), 1)[0]);
   }
-  console.log('done w while;', 'currentNode', currentNode, 'startNode', startNode);
   return findShortestPath(currentNode, startNode)
+};
+
+Node.prototype.setCoords = function(x, y){ // don't worry about coords till A*
+  this.coords = {x: x, y: y};
 };
