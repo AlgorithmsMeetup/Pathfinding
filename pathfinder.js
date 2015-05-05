@@ -1,8 +1,8 @@
 // Dijkstra's Algorithm
 
-function getNodeWithLeastTentativeCost(nodes){
-  return nodes.reduce(function getLeastTentativeCost(leastNode, nextNode){
-    return leastNode.tentativeCost < nextNode.tentativeCost ? leastNode : nextNode ;
+function getNodeWithLeastTraversalCost(nodes){
+  return nodes.reduce(function getLeastTraversalCost(leastNode, nextNode){
+    return leastNode.traversalCost < nextNode.traversalCost ? leastNode : nextNode ;
   }, nodes[0]);
 };
 
@@ -13,7 +13,7 @@ function findShortestPath(currentNode, goalNode){ // where nodes between start a
     var nodesNotAlreadyInPath = currentNode.neighbors.filter(function(neighbor){
       return path.indexOf(neighbor) === -1;
     });
-    currentNode = getNodeWithLeastTentativeCost(nodesNotAlreadyInPath);
+    currentNode = getNodeWithLeastTraversalCost(nodesNotAlreadyInPath);
     path.push(currentNode);
   }
   path = path.reverse();
@@ -23,21 +23,21 @@ function findShortestPath(currentNode, goalNode){ // where nodes between start a
 function dijkstra(startNode, endNode){
   console.log({getAllNodes:getAllNodes(startNode)});
   var visitedNodes = [];
-  var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTentativeCost and splice
-  startNode.setTentativeCost(startNode.cost);
+  var unvisitedNodes = [startNode]; // minHeap is preferable to getNodeWithLeastTraversalCost and splice
+  startNode.setTraversalCost(startNode.cost);
   // assign tentative costs until end is visited
   while(currentNode !== endNode){
     // set current node to unvisited node w least tentative cost
-    var currentNode = getNodeWithLeastTentativeCost(unvisitedNodes);
+    var currentNode = getNodeWithLeastTraversalCost(unvisitedNodes);
     // consider unvisited neighbors
     var unvisitedNeighbors = currentNode.neighbors.filter(function(node){ return !~visitedNodes.indexOf(node); });;
     // add unvisited neighbors to unvisited minHeap
     unvisitedNodes = unvisitedNodes.concat(unvisitedNeighbors);
     // for each unvisited neighbor: calculate, compare, and if less, set tentative cost
     unvisitedNeighbors.forEach(function(neighbor){
-      var tentativeCost = currentNode.tentativeCost + neighbor.cost;
-      if (tentativeCost < neighbor.tentativeCost){
-        neighbor.setTentativeCost(tentativeCost);
+      var traversalCost = currentNode.traversalCost + neighbor.cost;
+      if (traversalCost < neighbor.traversalCost){
+        neighbor.setTraversalCost(traversalCost);
       }
     });
     // mark current node as visited
@@ -52,12 +52,12 @@ function dijkstra(startNode, endNode){
 function Node(name, cost){
   this.name = name;
   this.cost = cost;
-  this.tentativeCost = Infinity;
+  this.traversalCost = Infinity;
   this.neighbors = [];
 };
 
-Node.prototype.setTentativeCost = function(value) {
-  this.tentativeCost = value;
+Node.prototype.setTraversalCost = function(value) {
+  this.traversalCost = value;
 };
 
 Node.prototype.connectTo = function(node){
@@ -81,15 +81,15 @@ function astar(startNode, endNode){
   var visitedNodes = [];
   var unvisitedNodes = [startNode];
   var distanceHeuristic = createDistanceHeuristic(endNode.coords); // initialize heuristic
-  startNode.setTentativeCost(startNode.cost + distanceHeuristic(startNode.coords)); // use heuristic
+  startNode.setTraversalCost(startNode.cost + distanceHeuristic(startNode.coords)); // use heuristic
   while(currentNode !== endNode){
-    var currentNode = getNodeWithLeastTentativeCost(unvisitedNodes);
+    var currentNode = getNodeWithLeastTraversalCost(unvisitedNodes);
     var unvisitedNeighbors = currentNode.neighbors.filter(function(node){ return !~visitedNodes.indexOf(node); });;
     unvisitedNodes = unvisitedNodes.concat(unvisitedNeighbors);
     unvisitedNeighbors.forEach(function(neighbor){
-      var tentativeCost = currentNode.tentativeCost + neighbor.cost + distanceHeuristic(neighbor.coords); // use heuristic
-      if (tentativeCost < neighbor.tentativeCost){
-        neighbor.setTentativeCost(tentativeCost);
+      var traversalCost = currentNode.traversalCost + neighbor.cost + distanceHeuristic(neighbor.coords); // use heuristic
+      if (traversalCost < neighbor.traversalCost){
+        neighbor.setTraversalCost(traversalCost);
       }
     });
     visitedNodes.push(unvisitedNodes.splice(unvisitedNodes.indexOf(currentNode), 1)[0]);
