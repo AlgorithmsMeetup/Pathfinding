@@ -6,12 +6,14 @@ function getNodeWithLeastTentativeCost(nodes){
   }, nodes[0]);
 };
 
-function findShortestPath(currentNode, endNode){ // where nodes between start and end have tentative costs.
+function findShortestPath(currentNode, goalNode){ // where nodes between start and end have tentative costs.
   var path = [currentNode];
-  while(currentNode !== endNode){
-    currentNode = getNodeWithLeastTentativeCost(currentNode.neighbors.filter(function(neighbor){
-      return path.indexOf(neighbor) === -1; // don't select nodes already in the path; prevents infinite loops.
-    }));
+  while(currentNode !== goalNode){
+    // Only select nodes not already in the path (prevents infinite loops).
+    var nodesNotAlreadyInPath = currentNode.neighbors.filter(function(neighbor){
+      return path.indexOf(neighbor) === -1;
+    });
+    currentNode = getNodeWithLeastTentativeCost(nodesNotAlreadyInPath);
     path.push(currentNode);
   }
   path = path.reverse();
