@@ -1,9 +1,9 @@
 // Dijkstra's Algorithm
 
-function getNodeWithLeastTraversalCost(nodes){
-  return nodes.reduce(function getLeastTraversalCost(leastNode, nextNode){
+function getNodeWithLeastTraversalCost(arrayOfNodes){
+  return arrayOfNodes.reduce(function getLeastTraversalCost(leastNode, nextNode){
     return leastNode.traversalCost < nextNode.traversalCost ? leastNode : nextNode ;
-  }, nodes[0]);
+  }, arrayOfNodes[0]);
 };
 
 function findShortestPath(currentNode, goalNode){ // where nodes between start and end have tentative costs.
