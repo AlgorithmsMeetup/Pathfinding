@@ -1,6 +1,6 @@
 // Dijkstra's Algorithm
 
-function getNodeWithLeastTraversalCost(nodes){
+function getNodeWithLeastTraversalCost(arrayOfNodes){
   // return node with least traversalCost
 };
 
