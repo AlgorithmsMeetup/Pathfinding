@@ -28,3 +28,5 @@ The same as Dijkstra's but traversal cost also includes an additional term
 (a heuristic, or guiding guess) to bias the pathfinder in a particular way.
 
 ![A*](https://upload.wikimedia.org/wikipedia/commons/8/85/Weighted_A_star_with_eps_5.gif)
+##See also:
+- http://qiao.github.io/PathFinding.js/visual/
